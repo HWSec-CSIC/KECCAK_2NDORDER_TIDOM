@@ -4,17 +4,27 @@
 
 The dataset of captured traces is available at: https://saco.csic.es/s/gP9isFdxHsCHa5p
 
+Each file contains 5000 labeled traces, using the fields:
+
+- **`plaintexts` field**: Raw plaintext (without applying pre-masking) to be processed. Each entry is a vector of 16 `uint8` values.
+
+- **`masks` field**: Pre-mask generated using the computer’s TRNG, which is used to generate the pre-masked plaintext (by computing `plaintext ^ mask`), which is the value actually sent to the microcontroller (pre-masking technique detailed in previous emails and in the paper to avoid issues with storing the secret in memory). Each entry is a vector of 16 `uint8` values.
+
+- **`seeds` field**: Seed generated using the computer’s TRNG and sent to the microcontroller to generate the shares of the initial state using the ChaCha20 PRNG implemented in the C code. Each entry is a vector of 32 `uint8` values.
+
+- **`rounds` field**: Keccak round (from 1 to 24) whose output register values have been stored. Each entry is a `uint8` value.
+
 ## FILES
 - **firmware/mcu**: Contains all files related to STM32 target execution.
     - **/hal**: Libraries and drivers required for proper firmware execution. This folder has been modified from the version provided by ChipWhisperer to enable interrupts, timers, and other functionalities.
     - **/keccak_unmasked_Opt_ASSEMBLY**: Unmasked Keccak source code.
-        - **Keccak1600NoOpt.s**: ASM implementation of the unmasked Keccak permutation (ARM Cortex-M3).
+        - **Keccak1600NoOpt.s**: ASM implementation of the unmasked Keccak permutation (ARM Cortex-M4).
         - **KeccakFW.c**: High-level framework.
     - **/keccak_masked_TI3shares_1stOrder_Opt_ASSEMBLY/no-remasking**: Masked Keccak source code (1st-order Threshold Implementation with 3 shares).
-        - **Keccak1600NoOpt.s**: ASM implementation of the masked Keccak permutation (ARM Cortex-M3).
+        - **Keccak1600NoOpt.s**: ASM implementation of the masked Keccak permutation (ARM Cortex-M4).
         - **KeccakFW.c**: High-level framework.
     - **/keccak_masked_TI3shares_2ndOrder_Opt_ASSEMBLY/no-remasking**: Masked Keccak source code (1st+2nd-order Threshold Implementation with 3 shares).
-        - **Keccak1600NoOpt.s**: ASM implementation of the masked Keccak permutation (ARM Cortex-M3).
+        - **Keccak1600NoOpt.s**: ASM implementation of the masked Keccak permutation (ARM Cortex-M4).
         - **KeccakFW.c**: High-level framework.
 
 - **jupyter/KECCAK_Notebooks**: Contains notebooks for using ChipWhisperer, capturing traces, and performing TVLA.
